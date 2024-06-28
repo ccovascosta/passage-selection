@@ -1,1 +1,14 @@
 
+myenv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.env
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+debug_json/
