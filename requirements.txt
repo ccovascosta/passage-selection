@@ -1,0 +1,1 @@
+PyPDF2\npython-docx\npython-pptx\ntransformers\nscikit-learn
