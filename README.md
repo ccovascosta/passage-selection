@@ -33,16 +33,16 @@ passage-selection/
 
 ### Data Pipeline
 
- - *Data Ingestion:* The data_ingestion.py module handles extracting text from various document formats (PDF, DOCX, PPTX).
+ - *Data ingestion:* The data_ingestion.py module handles extracting text from various document formats (PDF, DOCX, PPTX).
  - *Preprocessing:* The preprocess.py module cleans and preprocesses the text, removing stop words and non-alphanumeric characters, converting text to lowercase, and splitting the text into passages. This standardizes the text for better retrieval performance.
- - *Query Processing:* The query_processing.py module processes the query in the same way as the document text, ensuring consistency.
-- *Document Retrieval:* The document_retrieval.py module uses TF-IDF vectorization and cosine similarity to retrieve the top K relevant documents for the query.
- - *Passage Extraction:* The passage_extraction.py module uses Sentence Transformers for semantic similarity to extract the most relevant passages from the top documents.
- - *Main Pipeline:* The main.py module ties everything together, providing a single entry point to run the passage selection pipeline.
+ - *Query processing:* The query_processing.py module processes the query in the same way as the document text, ensuring consistency.
+- *Document retrieval:* The document_retrieval.py module uses TF-IDF vectorization and cosine similarity to retrieve the top K relevant documents for the query.
+ - *Passage extraction:* The passage_extraction.py module uses Sentence Transformers for semantic similarity to extract the most relevant passages from the top documents.
+ - *Main pipeline:* The main.py module ties everything together, providing a single entry point to run the passage selection pipeline.
 
 ### Configuration File
 
-The config.json file allows you to configure the pipeline parameters. Below is an example configuration file with explanations for each parameter:
+The config.json file is used to configure the pipeline parameters. Below is an example configuration file with explanations for each parameter:
 
 ```json
 {
@@ -69,7 +69,7 @@ The config.json file allows you to configure the pipeline parameters. Below is a
 1. Clone the Repository:
 
 ```bash
-git clone https://github.com/your-username/passage-selection.git
+git clone https://github.com/ccovascosta/passage-selection.git
 cd passage-selection
 ```
 
@@ -91,11 +91,11 @@ pip install -r requirements.txt
 
 #### Option 1: Command Line
 
-1. Ensure config.json is Set Up:
+1. Ensure config.json is set up:
 
  - Edit the config.json file to point to the sample_data folder and provide an utterance.
 
-2. Run the Pipeline from the Command Line:
+2. Run the pipeline from the command Lline:
 
 ```bash
 python src/main.py
@@ -103,24 +103,25 @@ python src/main.py
 
 #### Option 2: Jupyter Notebook
 
-1. Start Jupyter Notebook:
+1. Start Jupyter notebook:
 
- - Navigate to the notebooks directory and start Jupyter Notebook:
+ - Navigate to the notebooks directory and start Jupyter notebook:
 
 ```bash
 cd notebooks
 jupyter notebook
 ```
 
-2. Open passage_selection_test.ipynb to interactively run and test the pipeline.
+2. Create a notebook to interactively run and test the pipeline.
 
 ## Future Improvements
 
- - Enhanced Preprocessing: Implement more advanced text preprocessing techniques such as lemmatization.
- - Advanced Retrieval Models: Explore other approaches for retrieving the top K documents, such as using other algorithms, such as BM25, and other approaches, such as likelihood (binary classification) models.
- - Improved Passage Extraction: Use more sophisticated models or techniques for passage extraction to improve the accuracy and relevance of the selected passages. Also test other approaches do split the text into passages in a better way.  
+ - Support other file types: Implement text extraction function for other types of files such as emails, text files, transcriptions.
+ - Enhanced preprocessing: Implement more advanced text preprocessing techniques such as lemmatization.
+ - Document retrieval: Explore other approaches for retrieving the top K documents, such as using other algorithms, such as BM25, or framing the problem as a binary classification to retrieve the documents with highest score (likelihood to contain relevant information).
+ - Improved passage extraction: Use more sophisticated models or techniques for passage extraction to improve the accuracy and relevance of the selected passages. Also test other approaches do split the text into passages to avoid unnecessary sentences and words.  
+ - Evaluation metrics: Assess the system's performance using evaluation metrics for document retrieval and for passage extraction.
  - Scalability: Optimize the pipeline for large-scale document processing and real-time performance.
- - Evaluation Metrics: Assess the system's performance using evaluation metrics document retrievaland for passage extraction.
 
  ## Example Output
 
