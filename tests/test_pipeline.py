@@ -5,7 +5,7 @@ class TestPassageSelectionPipeline(unittest.TestCase):
 
     def test_pipeline(self):
         utterance = "Explain the benefits of green tea"
-        folder_path = "path/to/your/test/documents"
+        folder_path = "sample_data"
         top_k = 5
         results = main(utterance, folder_path, top_k)
         self.assertTrue(len(results) > 0)
