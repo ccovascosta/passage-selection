@@ -1,62 +1,89 @@
-import json
 import os
 import sys
+import nltk
+import json
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from src.data_ingestion import load_documents
-from src.preprocess import preprocess_text
+from src.data_ingestion import load_document
+from src.preprocess import preprocess_text, split_text_into_passages
 from src.query_processing import process_query
 from src.document_retrieval import retrieve_documents
 from src.passage_extraction import extract_relevant_passages
+from src.utils import read_config, save_debug_json
 
-def read_config(config_file='config.json'):
-    if os.path.exists(config_file):
-        with open(config_file, 'r') as file:
-            config = json.load(file)
-            return config
-    else:
-        print(f"Configuration file '{config_file}' not found. Exiting.")
-        sys.exit(1)
+nltk.download('stopwords')
 
-def save_debug_json(doc_name, metadata, text, preprocessed_text, folder='debug_json'):
-    os.makedirs(folder, exist_ok=True)
-    debug_info = {
-        'filename': metadata['filename'],
-        'type': metadata['type'],
-        'title': metadata['title'],
-        'authors': metadata['authors'],
-        'lastmodifiedtime': metadata['lastmodifiedtime'],
-        'text': text,
-        'preprocessed_text': preprocessed_text
-    }
-    with open(os.path.join(folder, f"{doc_name}.json"), 'w', encoding='utf-8') as file:
-        json.dump(debug_info, file, indent=4)
+def main(debug=False):
+    config = read_config()
 
-def main(config_file='config.json', document_folder_path=None, query_text=None, top_k=None, passage_max_length=None, passage_overlap=None, split_method=None, debug=True):
-    config = read_config(config_file)
-    
-    document_folder_path = document_folder_path or config.get('document_folder_path') or input("Enter the folder path containing documents: ")
-    query_text = query_text or config.get('query_text') or input("Enter the query/utterance: ")
-    top_k = top_k or config.get('top_k', 5)
-    passage_max_length = passage_max_length or config.get('passage_max_length', 512)
-    passage_overlap = passage_overlap or config.get('passage_overlap', 50)
-    split_method = split_method or config.get('split_method', 'tokens')
-
-    documents = load_documents(document_folder_path)
-    preprocessed_documents = [(name, preprocess_text(text)) for name, text in documents]
-
-    if debug:
-        for name, text, metadata in preprocessed_documents:
-            preprocessed_text = preprocess_text(text)
-            save_debug_json(name, metadata, text, preprocessed_text)
+    document_folder_path = config.get('document_folder_path') or input("Enter the folder path containing documents: ")
+    query_text = config.get('query_text') or input("Enter the query/utterance: ")
+    top_k_docs = config.get('top_k_docs', 5)
+    top_n_passages = config.get('top_n_passages', 2)
+    passage_max_length = config.get('passage_max_length', 512)
+    passage_overlap = config.get('passage_overlap', 'tokens')
+    split_method = config.get('split_method', 'tokens')
 
     query = process_query(query_text)
-    top_documents = retrieve_documents(query, preprocessed_documents, top_k)
-    relevant_passages = extract_relevant_passages(query, top_documents, passage_max_length, passage_overlap, split_method)
+
+    documents = []
+
+    for file_name in os.listdir(document_folder_path):
+        file_path = os.path.join(document_folder_path, file_name)
+        if debug:
+            print(f"Reading document: {file_name}")
+        text, metadata = load_document(file_path)
+        if text is None:
+            continue
+
+        if debug:
+            print(f"Preprocessing document: {file_name}")
+
+        preprocessed_text = preprocess_text(text)
+
+        original_passages = split_text_into_passages(text, passage_max_length, passage_overlap, split_method)
+        preprocessed_passages = [preprocess_text(passage) for passage in original_passages]
+
+        documents.append((metadata, preprocessed_text, original_passages, preprocessed_passages))
+
+        if debug:
+            save_debug_json(metadata['filename'], metadata, text, preprocessed_passages)
+
+    if debug:
+        print("All documents have been processed.")
+        print(f"Evaluating the top {top_k_docs} most relevant documents")
+
+    top_documents = retrieve_documents(query, documents, top_k_docs, debug=debug)
+
+    if debug:
+        print("Extracting relevant passages from the top documents")
+
+    relevant_passages = []
+
+    for metadata, _, original_passages, preprocessed_passages in top_documents:
+        doc_name = metadata['filename']
+
+        if debug:
+            print(f"Extracting passages from document: {doc_name}")
+
+        passages = extract_relevant_passages(query, doc_name, original_passages, preprocessed_passages, top_n_passages)
+        relevant_passages.extend(passages)
+        if debug:
+            for passage in passages:
+                print(f"Document: {passage[0]}\nPassage: {passage[1]}\nScore: {passage[2]}\n")
+
+    if debug:
+        output_file = config.get('output_file', 'results.json')
+        with open(output_file, 'w', encoding='utf-8') as f:
+            json.dump(relevant_passages, f, ensure_ascii=False, indent=4)
+
+        print(f"Results have been written to {output_file}")
+
     return relevant_passages
 
 if __name__ == "__main__":
-    results = main()
+    debug_mode = True
+    results = main(debug=debug_mode)
     for result in results:
         print(f"Document: {result[0]}\nPassage: {result[1]}\nScore: {result[2]}\n")

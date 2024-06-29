@@ -1,8 +1,9 @@
 {
     "document_folder_path": "sample_data",
-    "query_text": "What are the applications of generative AI?",
-    "top_k": 5,
-    "passage_max_length": 512,
-    "passage_overlap": 50,
+    "query_text": "How does the consumption of tea and coffee impact health?",
+    "top_k_docs": 3,
+    "top_n_passages": 2,
+    "passage_max_length": 250,
+    "passage_overlap": 25,
     "split_method": "tokens"
 }

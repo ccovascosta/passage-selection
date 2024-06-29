@@ -1,0 +1,8 @@
+{
+    "filename": "Large Language Models for Dummies.pptx",
+    "type": "pptx",
+    "title": "PowerPoint Presentation",
+    "authors": "Jasmina Ludwig",
+    "lastmodifiedtime": "2024-06-28T18:26:16",
+    "text": "Machine Learning is improving exponentially\n2022\n1997\n12\n\n17\nLarge Language Models redux\nNed Friend\u00a0\nJason Wolfe\nOct 2022\u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0\u000b(See speaker notes for a full version of the talk track)\n\n\u000bRecording\n\nLarge Language Models (LLMs)\nModel: Machine Learned of the form\u00a0input2output\nLanguage:\u00a0nl2nl\nLarge: More data than can be labeled (growing 10x/year!)\n\"Few-shot\" learning through\u00a0prompts, not training\nFoundational Model to train smaller lower COGs models\n\nGPT3.5: nl2nl (Foundry playground, demos, Babel, ethics)\nDALLE: nl2image\nMakeAVideo: nl2video (and image2video, by Meta)\nCodex: nl2code (Github Copilot)\nFlow: nl2code in PowerAutomate\nOutlook: nl2action using SM\u00a0Harbor\nExcel (Duka Walla): nl2action using SM\u00a0Harbor\nM365 Graph: nl2action using SM\u00a0Harbor\nAdept\u2019s ACT-1: nl2action for any UX\nAI for Hire: nl2action vision for interpersonal orchestration\nLLM demo videos\nnl2image Examples\nStable Diffusion,\u00a0MidJourney,\u00a0Playing with DALL\u00b7E 2\n\nLensa\nChain of Thought and nl2code Examples\nModels require human oversight\nWhat text could a machine write for your\u00a0users?\nWhat actions could a machine do for your users?\nWhat other input2output data sets could machines train on to automate those\u00a0transformations?\nHow do we address the ethical and societal implications? (See ethics & society)\nDiscussion\nMAGE: LLM-like Foundation Model for Actions (actions2action)\n\n\n"
+}

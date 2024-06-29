@@ -1,41 +1,26 @@
-
 from transformers import pipeline
+from sentence_transformers import SentenceTransformer, util
+from nltk.tokenize import sent_tokenize
 
-retriever = pipeline("question-answering")
+embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+qa_pipeline = pipeline('question-answering', model='distilbert-base-cased-distilled-squad')
 
-def split_text_into_passages(text, max_length=512, overlap=50, method='tokens'):
-    if method == 'tokens':
-        words = text.split()
-        passages = []
-        current_passage = []
-        for word in words:
-            if len(current_passage) + len(word) <= max_length:
-                current_passage.append(word)
-            else:
-                passages.append(" ".join(current_passage))
-                current_passage = current_passage[-overlap:] + [word]
-        if current_passage:
-            passages.append(" ".join(current_passage))
-    elif method == 'sentences':
-        sentences = text.split('. ')
-        passages = []
-        current_passage = []
-        for sentence in sentences:
-            if len(" ".join(current_passage)) + len(sentence) <= max_length:
-                current_passage.append(sentence)
-            else:
-                passages.append(". ".join(current_passage) + '.')
-                current_passage = current_passage[-overlap:] + [sentence]
-        if current_passage:
-            passages.append(". ".join(current_passage) + '.')
-    return passages
 
-def extract_relevant_passages(query, documents, max_length=512, overlap=50, method='tokens'):
-    results = []
-    for doc_name, doc_text in documents:
-        passages = split_text_into_passages(doc_text, max_length, overlap, method)
-        for passage in passages:
-            result = retriever(question=query, context=passage)
-            results.append((doc_name, result['answer'], result['score']))
-    results.sort(key=lambda x: x[2], reverse=True)
-    return results
+
+def vectorize_texts(texts):
+    return embedding_model.encode(texts, convert_to_tensor=True)
+
+def compute_similarity(query_vec, passage_vecs):
+    return util.pytorch_cos_sim(query_vec, passage_vecs)
+
+def extract_relevant_passages(query, doc_name, original_passages, preprocessed_passages, top_n=5):
+
+    query_vec = embedding_model.encode(query, convert_to_tensor=True)
+    passage_vecs = embedding_model.encode(preprocessed_passages, convert_to_tensor=True)
+    
+    cosine_scores = compute_similarity(query_vec, passage_vecs)[0]
+    
+    top_n_indices = cosine_scores.argsort(descending=True)[:top_n]
+    top_passages = [(doc_name, original_passages[i], cosine_scores[i].item()) for i in top_n_indices]
+    
+    return top_passages
