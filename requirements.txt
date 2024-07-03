@@ -1,4 +1,4 @@
-notebook
+cohere
 PyPDF2
 python-docx
 python-pptx
@@ -6,5 +6,6 @@ nltk
 torch
 tf-keras
 transformers
+rank_bm25
 scikit-learn
 tqdm
