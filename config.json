@@ -1,9 +1,9 @@
 {
-    "document_folder_path": "",
-    "query": "How does the consumption of tea and coffee impact cardiovascular and cognitive health?",
+    "document_folder_path": "C:/Users/ccovascosta/source/repos/fy25/passage-selection/sample_data",
+    "query": "What is the concept of privacy? What privacy concerns should I be aware of while working with AI?",
     "top_k_docs": 3,
     "top_n_passages": 2,
-    "max_output_passages": 4,
+    "max_output_passages": 3,
     "passage_max_length": 250,
     "passage_overlap": 25,
     "split_method": "tokens",

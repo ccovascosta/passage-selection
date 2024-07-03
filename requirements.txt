@@ -8,4 +8,5 @@ tf-keras
 transformers
 rank_bm25
 scikit-learn
+streamlit
 tqdm

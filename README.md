@@ -125,7 +125,19 @@ cohere_client = cohere.Client('api_key')
 python src/main.py
 ```
 
-#### Option 2: Jupyter Notebook
+#### Option 2: Streamlit Interface
+
+1. Run the Streamlit App:
+
+```bash
+streamlit run app.py
+```
+
+2. Interact with the Web Interface to Select Parameters and Run the Pipeline:
+
+![Passage Selection Interface](images/passage_selection_interface.png)
+
+#### Option 3: Jupyter Notebook
 
 1. Start Jupyter notebook:
 

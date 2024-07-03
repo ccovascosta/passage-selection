@@ -1,53 +1,66 @@
 import streamlit as st
 from src.utils import load_config, update_config
 from src.passage_selector import run_pipeline
+import tkinter as tk
+from tkinter import filedialog
 import os
 
+def select_folder():
+    root = tk.Tk()
+    root.withdraw()
+    root.wm_attributes('-topmost', 1)
+    folder_selected = filedialog.askdirectory(master=root)
+    return folder_selected
+
 def main():
+    st.markdown(
+        """
+        <style>
+        .main .block-container {
+            max-width: 1200px;
+            padding-top: 2rem;
+            padding-right: 2rem;
+            padding-left: 2rem;
+            padding-bottom: 2rem;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
     st.title("Passage Selection Pipeline")
 
     config = load_config()
 
-    document_folder_path = config["document_folder_path"]
-    uploaded_file = st.file_uploader("Upload a dummy file from the target folder", type=['txt', 'pdf', 'docx', 'pptx'])
-    
-    if uploaded_file is not None:
-        folder_selected = os.path.dirname(uploaded_file.name)
-        st.text(f"Selected folder: {folder_selected}")
-        document_folder_path = folder_selected
+    query = st.text_input("Enter your query:", config['query'])
 
-    query = st.text_input("Enter your query:", config["query"])
-    preprocess_query = st.checkbox("Preprocess Query", config["preprocess_query"])
-    top_k_docs = st.slider("Top K Documents", 1, 10, config["top_k_docs"])
-    top_n_passages = st.slider("Top N Passages per Document", 1, 5, config["top_n_passages"])
-    passage_max_length = st.slider("Passage Max Length", 100, 1000, config["passage_max_length"])
-    passage_overlap = st.slider("Passage Overlap", 0, 100, config["passage_overlap"])
-    split_method = st.selectbox("Split Method", ["tokens", "sentences"], index=["tokens", "sentences"].index(config["split_method"]))
-    retrieval_algorithm = st.selectbox("Retrieval Algorithm", ["bm25", "tfidf"], index=["bm25", "tfidf"].index(config["retrieval_algorithm"]))
-    ranking_method = st.selectbox("Ranking Method", ["sentence_transformers", "cohere_rerank"], index=["sentence_transformers", "cohere_rerank"].index(config["ranking_method"]))
-    max_output_passages = st.slider("Final Number of Passages", 1, 20, config["max_output_passages"])
+    if st.button('Select Folder'):
+        folder_selected = select_folder()
+        #st.text(f"Selected folder: {folder_selected}")
+        config["document_folder_path"] = folder_selected
+
+    if "document_folder_path" in config and config["document_folder_path"]:
+        st.text(f"Selected folder path: {config['document_folder_path']}")
+
+    retrieval_algorithm = st.selectbox("Document Retrieval Algorithm", ["bm25", "tfidf"], index=["bm25", "tfidf"].index(config['retrieval_algorithm']))
+    ranking_method = st.selectbox("Passage Selection Method", ["sentence_transformers", "cohere_rerank"], index=["sentence_transformers", "cohere_rerank"].index(config['ranking_method']))
 
     updates = {
-        "document_folder_path": document_folder_path,
-        "query_text": query,
-        "top_k_docs": top_k_docs,
-        "top_n_passages": top_n_passages,
-        "max_output_passages": max_output_passages,
-        "passage_max_length": passage_max_length,
-        "passage_overlap": passage_overlap,
-        "split_method": split_method,
+        "query": query,
         "retrieval_algorithm": retrieval_algorithm,
         "ranking_method": ranking_method,
-        "preprocess_query": preprocess_query
+        "document_folder_path": config.get("document_folder_path", "")
     }
 
-    # Update the configuration with the new values
     update_config(config, updates)
 
     if st.button("Run Pipeline"):
-        relevant_passages = run_pipeline(config, debug=True)
+        query, relevant_passages = run_pipeline(config, debug=True)
         for result in relevant_passages:
-            st.write(f"Document: {result[0]}\nPassage: {result[1]}\nScore: {result[2]}\n")
+            st.write(f"**Document:** {result[0]}")
+            st.write(f"**Passage:** {result[1]}")
+            st.write(f"**Score:** {result[2]}")
+            st.write("---")
 
 if __name__ == "__main__":
     main()
