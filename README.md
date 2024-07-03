@@ -37,8 +37,8 @@ passage-selection/
 
 ### Use Cases
 
- - Passage Selector Pipeline: This is intended for passage selection task. This pipelines allows a user to point to a folder of documents and a query, and retrieve the top K documents with the most relevant passages.
- - Evaluation Pipeline (to-do): This is designed to evaluate different document retrieval and passage selection approaches using the [MS MARCO dataset](https://microsoft.github.io/msmarco/Datasets.html).
+ - **Passage Selector Pipeline:** This is intended for passage selection task. This pipelines allows a user to point to a folder of documents and a query, and retrieve the top K documents with the most relevant passages.
+ - **Evaluation Pipeline (to-do):** This is designed to evaluate different document retrieval and passage selection approaches using the [MS MARCO dataset](https://microsoft.github.io/msmarco/Datasets.html).
 
 ### Data Pipeline
 
@@ -46,12 +46,12 @@ passage-selection/
  - **Preprocessing:** The preprocess.py module cleans and preprocesses the text, removing stop words and non-alphanumeric characters, converting text to lowercase, and splitting the text into passages.
  - **Query processing:** The query_processing.py is an optional module that processes the query in the same way as the document text.
  - **Document Retrieval:** The document_retrieval.py module supports different algorithms:
-     - TF-IDF: A traditional method that uses term frequency-inverse document frequency to rank documents. If this algorithm is selected, the retrieval module will use TF-IDF vectorization and cosine similarity to retrieve the top K relevant documents for the query.
-     - [BM25](https://www.cs.otago.ac.nz/homepages/andrew/papers/2014-2.pdf): uses [rank-bm25](https://pypi.org/project/rank-bm25/) python library, which provides a collection of BM25 algorithms for querying a set of documents and returning the ones most relevant to the query.
+     - **TF-IDF:** A traditional method that uses term frequency-inverse document frequency to rank documents. If this algorithm is selected, the retrieval module will use TF-IDF vectorization and cosine similarity to retrieve the top K relevant documents for the query.
+     - **[BM25](https://www.cs.otago.ac.nz/homepages/andrew/papers/2014-2.pdf):** uses [rank-bm25](https://pypi.org/project/rank-bm25/) python library, which provides a collection of BM25 algorithms for querying a set of documents and returning the ones most relevant to the query.
  - **Passage extraction:** The passage_extraction.py module supports:
      - Sentence Transformers: Uses [all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2) sentence transformer model, which maps sentence and paragraphs to a 384 dimensional dense vector space for semantic search in order to extract the most relevant passages from the top documents.
      - Cohere Rerank: Uses the [Cohere Rerank](https://cohere.com/blog/rerank) for passage selection based on their relevance to the query.
- - **Passage Selector pipeline:** The main.py module ties everything together, providing a single entry point to run the passage selection pipeline.
+ - **Passage Selector pipeline:** The passage_selector.py module ties everything together, providing a single entry point to run the passage selection pipeline.
  - **Evaluation pipeline (to-do):** The evaluation.py module uses the MS MARCO dataset to evaluate and compare different document retrieval and passage selection methods.
 
 ### Passage Processing Functions
@@ -118,14 +118,14 @@ myenv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4. Cohere API Setup (Optional)
+4. Cohere API Setup (Optional):
 
-To use the Cohere rerank method, you need to get an API key from Cohere:
+    To use the Cohere rerank method, you need to get an API key from Cohere:
 
-    4.1. Sign up for a free account at Cohere.
-    4.2. After signing up, go to the [API keys section](https://dashboard.cohere.com/api-keys) in your Cohere dashboard.
-    4.3. Copy the API key provided.
-    4.4. Update the API key in the [src/passage_extraction.py](https://github.com/ccovascosta/passage-selection/blob/main/src/passage_extraction.py) file:
+      - Sign up for a free account at Cohere.
+      After signing up, go to the [API keys section](https://dashboard.cohere.com/api-keys) in your Cohere dashboard.
+      Copy the API key provided.
+      Update the API key in the [src/passage_extraction.py](https://github.com/ccovascosta/passage-selection/blob/main/src/passage_extraction.py) file:
 
 ```python
 cohere_client = cohere.Client('api_key')
@@ -182,7 +182,7 @@ Run the Evaluation Script:
 
  - **Support other file types:** Implement text extraction function for other types of files such as emails, text files, transcriptions.
  - **Enhanced preprocessing:** Implement more advanced text preprocessing techniques.
- - **Document retrieval:** Explore other approaches for retrieving the top K documents, such Learn to Rank.
+ - **Document retrieval:** Explore other ML based approaches for retrieving the top K documents, such Learn to Rank.
  - **Improved passage extraction:** Use more sophisticated models or techniques for passage extraction to improve the accuracy and relevance of the selected passages. Also test other approaches do split the text into passages to avoid unnecessary sentences and words.  
  - **Evaluation metrics:** Assess the system's performance using evaluation metrics for document retrieval and passage extraction, such as Mean Reciprocal Rank (MRR), Normalized Discounted Cumulative Gain (nDCG), and Precision@k. Leverage publicly available datasets, such as MS MARCO, for this evaluation.
  - **Scalability:** Optimize the pipeline for large-scale document processing and real-time performance using Azure.
