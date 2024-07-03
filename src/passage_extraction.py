@@ -4,7 +4,7 @@ from sentence_transformers import SentenceTransformer, util
 from nltk.tokenize import sent_tokenize
 import re
 
-cohere_client = cohere.Client('KstgNdd7d5wUyUYwoonCmUo1igq6KwLLLzL1EG4Q')
+cohere_client = cohere.Client('')
 embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
 qa_pipeline = pipeline('question-answering', model='distilbert-base-cased-distilled-squad')
 
