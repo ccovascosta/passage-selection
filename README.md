@@ -182,7 +182,7 @@ Run the Evaluation Script:
 
  - **Support other file types:** Implement text extraction function for other types of files such as emails, text files, transcriptions.
  - **Enhanced preprocessing:** Implement more advanced text preprocessing techniques.
- - **Document retrieval:** Explore other ML based approaches for retrieving the top K documents, such Learn to Rank.
+ - **Document retrieval:** Explore other ML based approaches for retrieving the top K documents, such [Learning to Rank](https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/tr-2007-40.pdf).
  - **Improved passage extraction:** Use more sophisticated models or techniques for passage extraction to improve the accuracy and relevance of the selected passages. Also test other approaches do split the text into passages to avoid unnecessary sentences and words.  
  - **Evaluation metrics:** Assess the system's performance using evaluation metrics for document retrieval and passage extraction, such as Mean Reciprocal Rank (MRR), Normalized Discounted Cumulative Gain (nDCG), and Precision@k. Leverage publicly available datasets, such as MS MARCO, for this evaluation.
  - **Scalability:** Optimize the pipeline for large-scale document processing and real-time performance using Azure.
