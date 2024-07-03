@@ -123,9 +123,9 @@ pip install -r requirements.txt
     To use the Cohere rerank method, you need to get an API key from Cohere:
 
       - Sign up for a free account at Cohere.
-      After signing up, go to the [API keys section](https://dashboard.cohere.com/api-keys) in your Cohere dashboard.
-      Copy the API key provided.
-      Update the API key in the [src/passage_extraction.py](https://github.com/ccovascosta/passage-selection/blob/main/src/passage_extraction.py) file:
+      - After signing up, go to the [API keys section](https://dashboard.cohere.com/api-keys) in your Cohere dashboard.
+      - Copy the API key provided.
+      - Update the API key in the [src/passage_extraction.py](https://github.com/ccovascosta/passage-selection/blob/main/src/passage_extraction.py) file:
 
 ```python
 cohere_client = cohere.Client('api_key')
