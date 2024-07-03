@@ -46,19 +46,7 @@ def cohere_rerank(query, passages, top_n):
     )
     return response.results
 
-def extract_relevant_passages(query, doc_name, original_passages, preprocessed_passages, top_n=5, method='semantic_search'):
-
-    query_vec = embedding_model.encode(query, convert_to_tensor=True)
-    passage_vecs = embedding_model.encode(preprocessed_passages, convert_to_tensor=True)
-    
-    cosine_scores = compute_similarity(query_vec, passage_vecs)[0]
-    
-    top_n_indices = cosine_scores.argsort(descending=True)[:top_n]
-    top_passages = [(doc_name, original_passages[i], cosine_scores[i].item()) for i in top_n_indices]
-    
-    return top_passages
-
-def extract_relevant_passages(query, doc_name, original_passages, preprocessed_passages, top_n=5, method='semantic_search'):
+def extract_relevant_passages(query, doc_name, original_passages, preprocessed_passages, top_n=5, method='sentence_transformers'):
 
     filtered_original_passages = [p for p in original_passages if is_valid_passage(p)]
     filtered_preprocessed_passages = [p for p in preprocessed_passages if is_valid_passage(p)]
@@ -69,10 +57,12 @@ def extract_relevant_passages(query, doc_name, original_passages, preprocessed_p
         cosine_scores = compute_similarity(query_vec, passage_vecs)[0]
         top_n_indices = cosine_scores.argsort(descending=True)[:top_n]
         top_passages = [(doc_name, filtered_original_passages[i], cosine_scores[i].item()) for i in top_n_indices]
+
     elif method == 'cohere_rerank':
         response = cohere_rerank(query, filtered_original_passages, top_n=top_n)
         ranked_passages = sorted(response, key=lambda x: x.relevance_score, reverse=True)[:top_n]
         top_passages = [(doc_name, passage.document.text if passage.document is not None else "", passage.relevance_score) for passage in ranked_passages]
+        
     else:
         raise ValueError(f"Unsupported method: {method}")
     

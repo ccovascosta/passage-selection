@@ -1,13 +1,15 @@
 {
-    "document_folder_path": "sample_data",
+    "document_folder_path": "",
     "query": "How does the consumption of tea and coffee impact cardiovascular and cognitive health?",
     "top_k_docs": 3,
     "top_n_passages": 2,
-    "max_output_passages": 3,
+    "max_output_passages": 4,
     "passage_max_length": 250,
     "passage_overlap": 25,
     "split_method": "tokens",
     "retrieval_algorithm": "bm25",
     "ranking_method": "cohere_rerank",
-    "output_file": "results.json"
+    "output_file": "results.json",
+    "preprocess_query": false,
+    "query_text": "How does the consumption of tea and coffee impact cardiovascular and cognitive health?"
 }
