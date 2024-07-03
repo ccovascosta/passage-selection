@@ -13,14 +13,19 @@ passage-selection/
 ├── requirements.txt
 ├── myenv/
 ├── sample_data/
+└── evaluation_data/
+├── processed_folder/
+├── images/
 ├── src/
 │   ├── __init__.py
 │   ├── data_ingestion.py
+│   ├── document_retrieval.py
+│   ├── utils.py
+│   ├── passage_extraction.py
+│   ├── passage_selector.py
 │   ├── preprocess.py
 │   ├── query_processing.py
-│   ├── document_retrieval.py
-│   ├── passage_extraction.py
-│   └── main.py
+│   └── utils.py
 ├── tests/
 │   ├── __init__.py
 │   └── test_pipeline.py
@@ -28,21 +33,36 @@ passage-selection/
     └── passage_selection_test.ipynb
 ```
 
-
 ## Overview 
+
+### Use Cases
+
+ - Passage Selector Pipeline: This is intended for passage selection task. This pipelines allows a user to point to a folder of documents and a query, and retrieve the top K documents with the most relevant passages.
+ - Evaluation Pipeline (to-do): This is designed to evaluate different document retrieval and passage selection approaches using the [MS MARCO dataset](https://microsoft.github.io/msmarco/Datasets.html).
 
 ### Data Pipeline
 
- - *Data ingestion:* The data_ingestion.py module handles extracting text from various document formats (PDF, DOCX, PPTX).
- - *Preprocessing:* The preprocess.py module cleans and preprocesses the text, removing stop words and non-alphanumeric characters, converting text to lowercase, and splitting the text into passages.
- - *Query processing:* The query_processing.py is an optional module that processes the query in the same way as the document text.
- - *Document Retrieval:* The document_retrieval.py module supports different algorithms:
+ - **Data ingestion:** The data_ingestion.py module handles extracting text from various document formats (PDF, DOCX, PPTX).
+ - **Preprocessing:** The preprocess.py module cleans and preprocesses the text, removing stop words and non-alphanumeric characters, converting text to lowercase, and splitting the text into passages.
+ - **Query processing:** The query_processing.py is an optional module that processes the query in the same way as the document text.
+ - **Document Retrieval:** The document_retrieval.py module supports different algorithms:
      - TF-IDF: A traditional method that uses term frequency-inverse document frequency to rank documents. If this algorithm is selected, the retrieval module will use TF-IDF vectorization and cosine similarity to retrieve the top K relevant documents for the query.
      - [BM25](https://www.cs.otago.ac.nz/homepages/andrew/papers/2014-2.pdf): uses [rank-bm25](https://pypi.org/project/rank-bm25/) python library, which provides a collection of BM25 algorithms for querying a set of documents and returning the ones most relevant to the query.
- - *Passage extraction:* The passage_extraction.py module supports:
+ - **Passage extraction:** The passage_extraction.py module supports:
      - Sentence Transformers: Uses [all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2) sentence transformer model, which maps sentence and paragraphs to a 384 dimensional dense vector space for semantic search in order to extract the most relevant passages from the top documents.
      - Cohere Rerank: Uses the [Cohere Rerank](https://cohere.com/blog/rerank) for passage selection based on their relevance to the query.
- - *Main pipeline:* The main.py module ties everything together, providing a single entry point to run the passage selection pipeline.
+ - **Passage Selector pipeline:** The main.py module ties everything together, providing a single entry point to run the passage selection pipeline.
+ - **Evaluation pipeline (to-do):** The evaluation.py module uses the MS MARCO dataset to evaluate and compare different document retrieval and passage selection methods.
+
+### Passage Processing Functions
+
+ - **Passage Splitting:** The *split_text_into_passages* function splits a text into smaller passages using various methods, including token-based splitting, sentence-based splitting, and semantic splitting with a sentence transformer model. The goal is to create manageable chunks of text that can be independently evaluated for relevance.
+
+ - **Passage Validity Check:** The *is_valid_passage* function checks the validity of a passage by applying several heuristics, such as checking for a high ratio of non-alphanumeric characters, the presence of certain citation patterns, and the frequency of years or author patterns. Passages failing these checks are considered invalid.
+
+ - **Passage Extraction:** The *extract_relevant_passages* function extracts the most relevant passages from the top-ranked documents. It uses either sentence transformers or Cohere's reranking model to rank the passages and then filters out redundant passages to ensure diversity in the results.
+
+ - **Redundancy Check:** The *is_redundant* function checks if a passage is redundant by comparing it to a list of already selected passages using cosine similarity of their embeddings. If the similarity score is above a certain threshold, the passage is considered redundant and not included in the final results.
 
 ### Configuration File
 
@@ -64,17 +84,17 @@ The config.json file is used to configure the pipeline parameters. Below is an e
 }
 ```
 
- - *document_folder_path:* The path to the folder containing the documents to be processed.
- - *query_text:* The query or utterance to search for in the documents.
- - *top_k:* The number of top documents to retrieve based on the query.
- - *top_n_passages:* The number of top passages to extract from each top document.
- - final_n_passages: The final number of passages to return.
- - *passage_max_length:* The maximum length of each passage (in tokens or sentences).
- - *passage_overlap:* The number of tokens or sentences to overlap between consecutive passages.
- - *split_method:* The method to split the text into passages (tokens or sentences).
- - *retrieval_algorithm:* The algorithm for document retrieval (tfidf or bm25).
- - *ranking_method:* The method for passage ranking (sentence_transformers or cohere_rerank).
- - *output_file:* The file to write the results to.
+ - **document_folder_path:** The path to the folder containing the documents to be processed.
+ - **query_text:** The query or utterance to search for in the documents.
+ - **top_k:** The number of top documents to retrieve based on the query.
+ - **top_n_passages:** The number of top passages to extract from each top document.
+ - **final_n_passages:** The final number of passages to return.
+ - **passage_max_length:** The maximum length of each passage (in tokens or sentences).
+ - **passage_overlap:** The number of tokens or sentences to overlap between consecutive passages.
+ - **split_method:** The method to split the text into passages (tokens or sentences).
+ - **retrieval_algorithm:** The algorithm for document retrieval (tfidf or bm25).
+ - **ranking_method:** The method for passage ranking (sentence_transformers or cohere_rerank).
+ - **output_file:** The file to write the results to.
 
 ### Installation
 
@@ -102,10 +122,10 @@ pip install -r requirements.txt
 
 To use the Cohere rerank method, you need to get an API key from Cohere:
 
-    1. Sign up for a free account at Cohere.
-    2. After signing up, go to the [API keys section](https://dashboard.cohere.com/api-keys) in your Cohere dashboard.
-    3. Copy the API key provided.
-    4. Update the API key in the [src/passage_extraction.py](https://github.com/ccovascosta/passage-selection/blob/main/src/passage_extraction.py) file:
+    4.1. Sign up for a free account at Cohere.
+    4.2. After signing up, go to the [API keys section](https://dashboard.cohere.com/api-keys) in your Cohere dashboard.
+    4.3. Copy the API key provided.
+    4.4. Update the API key in the [src/passage_extraction.py](https://github.com/ccovascosta/passage-selection/blob/main/src/passage_extraction.py) file:
 
 ```python
 cohere_client = cohere.Client('api_key')
@@ -113,11 +133,13 @@ cohere_client = cohere.Client('api_key')
 
 ### Usage
 
+#### Passage selector Pipeline
+
 #### Option 1: Command Line
 
 1. Ensure config.json is set up:
 
- - Edit the config.json file to point to the sample_data folder and provide an utterance.
+    - Edit the config.json file to point to the sample_data folder and provide an utterance.
 
 2. Run the pipeline from the command Lline:
 
@@ -150,14 +172,20 @@ jupyter notebook
 
 2. Create a notebook to interactively run and test the pipeline.
 
+#### Evaluation Pipeline
+
+1. Ensure the Evaluation Data is in Place:
+    - Download and extract the [MS MARCO dataset](https://microsoft.github.io/msmarco/Datasets.html) into the evaluation_data folder.
+Run the Evaluation Script:
+
 ## Future Improvements
 
- - Support other file types: Implement text extraction function for other types of files such as emails, text files, transcriptions.
- - Enhanced preprocessing: Implement more advanced text preprocessing techniques such as lemmatization.
- - Document retrieval: Explore other approaches for retrieving the top K documents, such Learn to Rank.
- - Improved passage extraction: Use more sophisticated models or techniques for passage extraction to improve the accuracy and relevance of the selected passages. Also test other approaches do split the text into passages to avoid unnecessary sentences and words.  
- - Evaluation metrics: Assess the system's performance using evaluation metrics for document retrieval and for passage extraction.
- - Scalability: Optimize the pipeline for large-scale document processing and real-time performance.
+ - **Support other file types:** Implement text extraction function for other types of files such as emails, text files, transcriptions.
+ - **Enhanced preprocessing:** Implement more advanced text preprocessing techniques.
+ - **Document retrieval:** Explore other approaches for retrieving the top K documents, such Learn to Rank.
+ - **Improved passage extraction:** Use more sophisticated models or techniques for passage extraction to improve the accuracy and relevance of the selected passages. Also test other approaches do split the text into passages to avoid unnecessary sentences and words.  
+ - **Evaluation metrics:** Assess the system's performance using evaluation metrics for document retrieval and passage extraction, such as Mean Reciprocal Rank (MRR), Normalized Discounted Cumulative Gain (nDCG), and Precision@k. Leverage publicly available datasets, such as MS MARCO, for this evaluation.
+ - **Scalability:** Optimize the pipeline for large-scale document processing and real-time performance using Azure.
 
  ## Example Output
 
