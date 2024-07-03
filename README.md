@@ -135,7 +135,7 @@ streamlit run app.py
 
 2. Interact with the Web Interface to Select Parameters and Run the Pipeline:
 
-![Passage Selection Interface](images/passage_selection_interface.png)
+![Passage Selection Interface](images/passage-selection-interface.png)
 
 #### Option 3: Jupyter Notebook
 
